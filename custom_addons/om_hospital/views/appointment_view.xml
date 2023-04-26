@@ -5,19 +5,24 @@
         <field name="name">hospital.appointment.tree</field>
         <field name="model">hospital.appointment</field>
         <field name="arch" type="xml">
-            <tree create="0" delete="0"
+            <tree create="1" delete="1"
                   decoration-success="state == 'done'"
                   decoration-danger="state == 'cancel'"
-                  decoration-warning="state == 'in_cosultation'">
+                  decoration-warning="state == 'in_consultation'"
+                  sample="1" multi_edit="1">
                 <field name="patient_id"/>
+                <field name="gender" optional="hide"/>
+                <field name="ref" optional="hide"/>
+                <field name="doctor_id" optional="show" widget="many2one_avatar_user"/>
                 <field name="appointment_time"/>
-                <field name="booking_date"/>
+                <field name="booking_date" optional="show"/>
+                <field name="activity_ids" widget="list_activity"/>
                 <field name="priority" widget="priority"/>
                 <field name="state"
                        decoration-success="state == 'done'"
                        decoration-info="state == 'draft'"
                        decoration-danger="state == 'cancel'"
-                       decoration-warning="state == 'in_cosultation'"
+                       decoration-warning="state == 'in_consultation'"
                        widget="badge"/>
             </tree>
         </field>
@@ -40,10 +45,23 @@
         <field name="name">hospital.appointment.form</field>
         <field name="model">hospital.appointment</field>
         <field name="arch" type="xml">
-            <form create="0" delete="0" edit="0">
+            <form create="0" delete="0" edit="1">
                 <header>
-                    <field name="state" widget="statusbar" nolable="1" options="{'clickable': '1'}"
-                           statusbar_visible="draft,in_cosultation,done"/>
+                    <button name="action_in_consultation" string="In Consultation"
+                            type="object" class="oe_highlight" states="draft"
+                            data-hotkey="i"/>
+                    <button name="action_done" string="Mark as Done"
+                            type="object" class="oe_highlight" states="in_consultation"
+                            data-hotkey="d"/>
+                    <button name="action_cancel" string="Cancel"
+                            type="object" states="draft,in_consultation"
+                            data-hotkey="z"/>
+                    <button name="action_re_draft" string="Re-Draft"
+                            type="object" class="oe_highlight" states="cancel"
+                            data-hotkey="x"/>
+                    <!--                    options="{'clickable': '1'}"-->
+                    <field name="state" widget="statusbar" nolable="1"
+                           statusbar_visible="draft,in_consultation,done"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -55,7 +73,8 @@
                         <group>
                             <field name="patient_id"/>
                             <field name="gender"/>
-                            <field name="booking_date" help="Date of Entering The Booking"/>
+                            <field name="doctor_id" widget="many2one_avatar"/>
+                            <field name="booking_date" help="Date of Entering The Booking" default_focus="1"/>
                         </group>
                         <group>
                             <field name="ref"/>
@@ -72,8 +91,10 @@
                     </group>
 
                     <notebook>
-                        <page string="Prescription" name="perscription">
-                            <field name="prescription" placeholder="Enter your prescription"/>
+                        <page string="Prescription" name="prescription">
+                            <field name="prescription"
+                                   placeholder="Enter your prescription"
+                                   options="{'collaborative': true, 'resizable': true}"/>
                         </page>
                         <page string="Pharmacy" name="pharmacy">
                             <group>

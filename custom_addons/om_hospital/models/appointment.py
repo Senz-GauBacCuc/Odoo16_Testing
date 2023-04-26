@@ -11,6 +11,7 @@ class HospitalPatient(models.Model):
     gender = fields.Selection(related='patient_id.gender')
     appointment_time = fields.Datetime(string="Appointment Time", default=fields.Datetime.now)
     booking_date = fields.Date(string="Booking Date", default=fields.Date.context_today)
+    doctor_id = fields.Many2one('res.users', string="Doctor")
 
     ref = fields.Char('Reference')
     prescription = fields.Html(string='Prescription')
@@ -22,7 +23,7 @@ class HospitalPatient(models.Model):
 
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('in_cosultation', 'In Cosultation'),
+        ('in_consultation', 'In Consultation'),
         ('done', 'Done'),
         ('cancel', 'Canceled')], string="Status", default="draft")
 
@@ -39,3 +40,21 @@ class HospitalPatient(models.Model):
                 'type': 'rainbow_man',
             }
         }
+
+    def action_in_consultation(self):
+        for rec in self:
+            rec.state = 'in_consultation'
+
+    def action_done(self):
+        for rec in self:
+            rec.state = 'done'
+
+    def action_cancel(self):
+        for rec in self:
+            rec.state = 'cancel'
+
+    def action_re_draft(self):
+        for rec in self:
+            rec.state = 'draft'
+
+
