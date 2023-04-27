@@ -1,7 +1,7 @@
 from odoo import api, models, fields
 
 
-class HospitalPatient(models.Model):
+class HospitalAppointment(models.Model):
     _name = "hospital.appointment"
     _inherit = ["mail.thread", 'mail.activity.mixin']
     _description = "Hospital Appointment"
@@ -12,6 +12,8 @@ class HospitalPatient(models.Model):
     appointment_time = fields.Datetime(string="Appointment Time", default=fields.Datetime.now)
     booking_date = fields.Date(string="Booking Date", default=fields.Date.context_today)
     doctor_id = fields.Many2one('res.users', string="Doctor")
+    pharmacy_line_ids = fields.One2many('appointment.pharmacy.lines', 'appointment_id', string='Pharmacy Lines')
+    hide_sales_price = fields.Boolean(string='Hide Sales Price')
 
     ref = fields.Char('Reference')
     prescription = fields.Html(string='Prescription')
